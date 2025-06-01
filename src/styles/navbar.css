@@ -1,0 +1,106 @@
+/* src/styles/navbar.css */
+
+/* --- Variables (Consistent with other styles) --- */
+:root {
+  --navbar-bg: #3f51b5; /* Primary blue for background */
+  --navbar-text: #ffffff;
+  --navbar-hover-text: #c5cae9; /* Lighter shade for hover */
+  --navbar-shadow: rgba(0, 0, 0, 0.2);
+  --font-family-sans: 'Roboto', 'Segoe UI', Arial, sans-serif;
+}
+
+/* --- Base Navbar Styles --- */
+.navbar {
+  background-color: var(--navbar-bg);
+  padding: 1rem 1.5rem; /* Standard padding */
+  color: var(--navbar-text);
+  box-shadow: 0 4px 8px var(--navbar-shadow);
+  font-family: var(--font-family-sans);
+}
+
+.navbar-container {
+  max-width: 1280px; /* Aligns with common container widths */
+  margin: 0 auto; /* Center the container */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 1rem; /* Space between logo and links on wrap */
+}
+
+/* --- Brand/Logo Styles --- */
+.navbar-brand {
+  font-size: 1.8rem; /* Slightly larger for brand */
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--navbar-text);
+  transition: color 0.2s ease;
+  letter-spacing: -0.03em; /* Tighten for a sleek look */
+}
+
+.navbar-brand:hover {
+  color: var(--navbar-hover-text);
+}
+
+/* --- Navigation Links Container --- */
+.navbar-links {
+  display: flex;
+  gap: 1.5rem; /* Space between individual links */
+  flex-wrap: wrap; /* Allow links to wrap */
+  justify-content: flex-end; /* Align links to the right */
+}
+
+/* --- Individual Navigation Link Styles --- */
+.nav-link {
+  text-decoration: none;
+  color: var(--navbar-text);
+  font-size: 1.05rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  padding: 0.25rem 0; /* Small vertical padding for hover area */
+  white-space: nowrap; /* Keep links on one line */
+}
+
+.nav-link:hover {
+  color: var(--navbar-hover-text);
+  /* You can add an underline effect or a subtle transform here if desired */
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .navbar-container {
+    flex-direction: column; /* Stack logo and links vertically */
+    align-items: flex-start; /* Align everything to the left */
+  }
+
+  .navbar-brand {
+    margin-bottom: 1rem; /* Space below the logo */
+    font-size: 1.6rem;
+  }
+
+  .navbar-links {
+    width: 100%; /* Links take full width */
+    justify-content: flex-start; /* Align links to the left */
+    gap: 1rem; /* Adjust gap for stacked links */
+  }
+
+  .nav-link {
+    font-size: 1rem;
+    padding: 0.2rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 1rem; /* Reduce padding on very small screens */
+  }
+  .navbar-brand {
+    font-size: 1.5rem;
+  }
+  .navbar-links {
+    gap: 0.8rem; /* Further reduce gap */
+  }
+  .nav-link {
+    font-size: 0.95rem;
+  }
+}

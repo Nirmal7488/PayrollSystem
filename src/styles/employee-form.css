@@ -1,0 +1,182 @@
+/* src/styles/employee-form.css */
+
+/* --- General Page Container --- */
+.add-employee-page-container {
+  min-height: 100vh;
+  background-color: #f3f4f6; /* bg-gray-100 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem; /* p-4 */
+  font-family: Arial, sans-serif;
+  color: #333;
+  box-sizing: border-box; /* Ensures padding doesn't push element outside bounds */
+}
+
+/* Loading State */
+.add-employee-page-container.loading-state {
+  text-align: center;
+  font-size: 1.125rem;
+  color: #6b7280;
+}
+
+/* --- Employee Form Card --- */
+.employee-form-card {
+  background-color: #ffffff; /* bg-white */
+  padding: 2rem; /* p-8 */
+  border-radius: 0.5rem; /* rounded-lg */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05); /* shadow-md */
+  width: 100%;
+  max-width: 64rem; /* max-w-4xl (approx 1024px) */
+  box-sizing: border-box;
+}
+
+/* Form Title */
+.form-title {
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: 700; /* font-bold */
+  text-align: center;
+  margin-bottom: 1.5rem; /* mb-6 */
+  color: #1f2937;
+}
+
+/* --- Status Messages (Error/Success) --- */
+.status-message {
+  text-align: center;
+  margin-bottom: 1rem; /* mb-4 */
+  font-size: 0.875rem; /* text-sm */
+}
+
+.status-message.error-message {
+  color: #dc2626; /* text-red-600 */
+}
+
+.status-message.success-message {
+  color: #16a34a; /* text-green-600 */
+}
+
+/* --- Employee Form Grid --- */
+.employee-form {
+  /* No direct space-y-4 needed, handled by form-grid gap */
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* grid-cols-1 for mobile */
+  gap: 1rem; /* gap-4 */
+}
+
+/* Media query for md:grid-cols-2 */
+@media (min-width: 768px) { /* Corresponds to md breakpoint */
+  .form-grid {
+    grid-template-columns: 1fr 1fr; /* md:grid-cols-2 */
+  }
+}
+
+/* Style for text area to span full width on larger screens */
+.form-group.full-width {
+  grid-column: 1 / -1; /* Spans all columns available in the grid */
+}
+
+/* --- Form Group & Elements --- */
+.form-group {
+  margin-bottom: 0; /* Remove default margin, gap handles spacing */
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 500; /* font-medium */
+  color: #374151; /* text-gray-700 */
+  margin-bottom: 0.25rem; /* mt-1 */
+}
+
+.required-asterisk {
+  color: #ef4444; /* text-red-500 */
+}
+
+.form-input {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem; /* px-3 py-2 */
+  border: 1px solid #d1d5db; /* border border-gray-300 */
+  border-radius: 0.375rem; /* rounded-md */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+  box-sizing: border-box; /* Important for width calculation */
+  font-size: 1rem;
+}
+
+/* Input Error Border */
+.form-input.input-error-border {
+  border-color: #ef4444; /* border-red-500 */
+}
+
+/* Input Focus Styles (reused from login/signup/employee-list) */
+.form-input:focus {
+  outline: none; /* focus:outline-none */
+  border-color: #3b82f6; /* focus:border-blue-500 */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* focus:ring-blue-500 */
+}
+
+/* Validation Message for Employee ID */
+.input-validation-message {
+  font-size: 0.75rem; /* text-xs */
+  margin-top: 0.25rem; /* mt-1 */
+}
+
+.input-validation-message.error-message-small {
+  color: #ef4444; /* text-red-500 */
+}
+
+/* --- Form Actions (Submit Button) --- */
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem; /* mt-6 */
+}
+
+.submit-button {
+  padding: 0.75rem 2rem; /* px-8 py-3 */
+  background-color: #2563eb; /* bg-blue-600 */
+  color: #ffffff; /* text-white */
+  border-radius: 0.375rem; /* rounded-md */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05); /* shadow-md */
+  transition: background-color 0.2s ease, opacity 0.2s ease; /* transition duration-200 */
+  border: none;
+  cursor: pointer;
+  font-size: 1rem; /* Base font size */
+  font-weight: 500; /* font-medium */
+}
+
+.submit-button:hover {
+  background-color: #1d4ed8; /* hover:bg-blue-700 */
+}
+
+/* Submit Button Focus Styles (reused) */
+.submit-button:focus {
+  outline: none; /* focus:outline-none */
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5), 0 0 0 2px rgba(255, 255, 255, 1); /* focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 */
+}
+
+/* Disabled Button Styles */
+.submit-button.disabled-button {
+  opacity: 0.5; /* disabled:opacity-50 */
+  cursor: not-allowed; /* disabled:cursor-not-allowed */
+}
+
+/* --- Back Link --- */
+.back-link-container {
+  text-align: center;
+  margin-top: 1.5rem; /* mt-6 */
+}
+
+.back-link {
+  color: #3b82f6; /* text-blue-500 */
+  text-decoration: none;
+  font-size: 0.875rem; /* text-sm */
+  transition: text-decoration 0.2s ease;
+}
+
+.back-link:hover {
+  text-decoration: underline; /* hover:underline */
+}

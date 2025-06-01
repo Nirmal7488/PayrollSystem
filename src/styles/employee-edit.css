@@ -1,0 +1,303 @@
+/* src/styles/employee-form.css */
+
+/* --- Base Styles & Variables (Optional but good practice) --- */
+:root {
+  --primary-blue: #007bff;
+  --primary-green: #28a745;
+  --accent-blue: #0056b3;
+  --accent-green: #218838;
+  --text-dark: #343a40;
+  --text-medium: #6c757d;
+  --text-light: #f8f9fa;
+  --bg-light: #e9ecef;
+  --border-light: #dee2e6;
+  --card-bg: #ffffff;
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-medium: rgba(0, 0, 0, 0.1);
+  --error-red: #dc3545;
+  --success-green: #28a745;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Modern font stack */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-light); /* Consistent light background */
+}
+
+/* --- General Page Container --- */
+.add-employee-page-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem; /* Slightly adjusted padding */
+  box-sizing: border-box;
+}
+
+/* Loading/Error State Message */
+.add-employee-page-container.loading-state,
+.add-employee-page-container.error-state {
+  text-align: center;
+  font-size: 1.15rem;
+  color: var(--text-medium);
+  padding: 2rem;
+}
+
+.add-employee-page-container.error-state {
+  color: var(--error-red);
+  font-weight: 500;
+}
+
+
+/* --- Employee Form Card --- */
+.employee-form-card {
+  background-color: var(--card-bg);
+  padding: 2.5rem 3rem; /* More generous padding */
+  border-radius: 12px; /* Smoother rounded corners */
+  box-shadow: 0 10px 30px var(--shadow-medium); /* More prominent, softer shadow */
+  width: 100%;
+  max-width: 900px; /* Wider form for better layout */
+  box-sizing: border-box;
+  border: 1px solid var(--border-light); /* Subtle border */
+}
+
+/* Form Title */
+.form-title {
+  font-size: 2.2rem;
+  font-weight: 700; /* Bolder title */
+  text-align: center;
+  margin-bottom: 2.5rem;
+  color: var(--text-dark);
+  letter-spacing: -0.02em; /* Slightly tighter letter spacing */
+}
+
+/* --- Status Messages (Error/Success) --- */
+.status-message {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+}
+
+.status-message.error-message {
+  background-color: #fce8e6; /* Light red */
+  color: var(--error-red);
+  border-color: #f1b0b7;
+}
+
+.status-message.success-message {
+  background-color: #e6f7ea; /* Light green */
+  color: var(--success-green);
+  border-color: #b8e0b9;
+}
+
+/* --- Employee Form Grid --- */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* Single column for small screens */
+  gap: 1.5rem 2rem; /* Vertical and horizontal gap */
+}
+
+@media (min-width: 768px) { /* md breakpoint */
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr); /* Two columns for larger screens */
+  }
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1; /* Spans full width */
+}
+
+/* --- Form Group & Elements --- */
+.form-group {
+  position: relative; /* For potential future absolute positioning of icons/errors */
+}
+
+.form-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600; /* Bolder label */
+  color: var(--text-dark);
+  margin-bottom: 0.6rem;
+}
+
+.required-asterisk {
+  color: var(--error-red);
+  margin-left: 0.25rem;
+}
+
+.form-input,
+.form-input select,
+.form-input textarea {
+  display: block;
+  width: 100%;
+  padding: 0.9rem 1.1rem; /* Generous padding */
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px var(--shadow-light); /* Subtle inner shadow */
+  box-sizing: border-box;
+  font-size: 1rem;
+  color: var(--text-dark);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-color: var(--card-bg); /* Ensure background is white */
+  -webkit-appearance: none; /* Remove default styling for selects */
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Read-only input field style for Employee ID */
+.form-input.read-only-input {
+  background-color: #f5f5f5; /* Slightly darker grey for read-only */
+  cursor: not-allowed;
+  color: var(--text-medium);
+  border-color: #e0e0e0;
+  box-shadow: none; /* No inner shadow for read-only */
+}
+
+/* Input Error Border */
+.form-input.input-error-border {
+  border-color: var(--error-red);
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25); /* Error focus ring */
+}
+
+/* Input Focus Styles */
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Primary blue focus ring */
+}
+
+/* Style for select arrow */
+.form-group select.form-input {
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%236c757d" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.8rem center;
+    background-size: 1.25rem;
+    padding-right: 2.5rem; /* Make space for the arrow */
+}
+
+
+/* Validation Message for Employee ID */
+.input-validation-message {
+  font-size: 0.8rem;
+  margin-top: 0.4rem;
+  color: var(--error-red);
+}
+
+/* --- Action Buttons --- */
+.form-actions,
+.form-actions-edit {
+  display: flex;
+  justify-content: center; /* Default for add page */
+  margin-top: 2.5rem;
+  gap: 1.5rem; /* Space between buttons */
+  flex-wrap: wrap; /* Allow wrapping */
+}
+
+.form-actions-edit {
+  justify-content: space-between; /* For edit page, separate buttons */
+}
+
+.submit-button {
+  padding: 1rem 2.5rem;
+  background-color: var(--primary-blue);
+  color: var(--text-light);
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); /* Subtle button shadow */
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600; /* Bolder button text */
+  letter-spacing: 0.02em;
+}
+
+.submit-button:hover {
+  background-color: var(--accent-blue);
+  box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+  transform: translateY(-1px); /* Slight lift on hover */
+}
+
+.submit-button:active {
+  transform: translateY(0); /* Press effect */
+}
+
+.submit-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.35); /* Focus ring */
+}
+
+/* Disabled Button Styles */
+.submit-button.disabled-button {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background-color: var(--primary-blue); /* Still primary blue but muted */
+  box-shadow: none;
+  transform: none;
+}
+
+/* Style for the Update Button (green for edit page) */
+.submit-button.update-button {
+  background-color: var(--primary-green);
+  box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+}
+
+.submit-button.update-button:hover {
+  background-color: var(--accent-green);
+  box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3);
+}
+
+.submit-button.update-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.35);
+}
+
+
+/* --- Back Link --- */
+.back-link {
+  color: var(--primary-blue);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.back-link:hover {
+  color: var(--accent-blue);
+  text-decoration: underline;
+}
+
+/* Responsive adjustments for labels/inputs on small screens */
+@media (max-width: 767px) {
+  .employee-form-card {
+    padding: 1.5rem;
+  }
+  .form-title {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+  }
+  .form-input,
+  .form-input select,
+  .form-input textarea {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+  }
+  .submit-button {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+  }
+  .form-actions,
+  .form-actions-edit {
+    flex-direction: column; /* Stack buttons vertically on small screens */
+    align-items: center;
+    gap: 1rem;
+  }
+  .back-link {
+    font-size: 0.85rem;
+  }
+}

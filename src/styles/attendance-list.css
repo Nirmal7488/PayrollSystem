@@ -1,0 +1,233 @@
+/* src/styles/attendance-list.css */
+
+/* --- Variables (Optional but good practice) --- */
+:root {
+  --primary-blue: #007bff;
+  --accent-blue: #0056b3;
+  --text-dark: #343a40;
+  --text-medium: #6c757d;
+  --bg-light: #f8f9fa; /* Lighter background for the page */
+  --card-bg: #ffffff;
+  --border-color: #e9ecef;
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-medium: rgba(0, 0, 0, 0.1);
+  --error-red: #dc3545;
+  --success-green: #28a745;
+
+  /* Status badge colors */
+  --status-present-bg: #e6ffed;
+  --status-present-text: #28a745;
+  --status-leave-bg: #fffbe6;
+  --status-leave-text: #ffc107; /* Adjusted to a more visible yellow */
+  --status-absent-bg: #ffe6e6;
+  --status-absent-text: #dc3545;
+}
+
+/* --- General Page Container --- */
+.attendance-page-container {
+  min-height: 100vh;
+  background-color: var(--bg-light); /* Light gray background */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Align to top, for better scrolling */
+  padding: 2rem;
+  box-sizing: border-box;
+  font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--text-dark);
+}
+
+/* Loading/Error States */
+.attendance-page-container.loading-state,
+.attendance-page-container.error-state {
+  align-items: center; /* Center content when just showing message */
+  text-align: center;
+  font-size: 1.15rem;
+  color: var(--text-medium);
+}
+
+.attendance-page-container.error-state {
+  color: var(--error-red);
+  font-weight: 500;
+}
+
+/* --- Attendance Card (Container for table) --- */
+.attendance-card {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px var(--shadow-medium);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 1200px; /* Wider card for table */
+  box-sizing: border-box;
+  border: 1px solid var(--border-color);
+}
+
+/* --- Header Section (Title and Add Button) --- */
+.attendance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 1rem; /* Space between items if they wrap */
+}
+
+.attendance-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.add-record-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.8rem 1.5rem;
+  background-color: var(--primary-blue);
+  color: var(--card-bg); /* White text */
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.add-record-button:hover {
+  background-color: var(--accent-blue);
+  box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.add-record-button:active {
+  transform: translateY(0);
+}
+
+.add-record-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.35);
+}
+
+/* --- No Records Message --- */
+.no-records-message {
+  text-align: center;
+  color: var(--text-medium);
+  font-size: 1.1rem;
+  padding: 2rem 0;
+}
+
+/* --- Table Styles --- */
+.table-responsive {
+  overflow-x: auto; /* Makes table scrollable on small screens */
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse; /* Removes double borders */
+  min-width: 800px; /* Ensure table doesn't get too squished */
+}
+
+.table-header {
+  background-color: var(--bg-light); /* Header background */
+}
+
+.table-th {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap; /* Prevent headers from wrapping */
+}
+
+.table-row:nth-child(even) {
+  background-color: #fcfcfc; /* Subtle stripe for readability */
+}
+
+.table-row:hover {
+  background-color: #f0f4f8; /* Light hover effect */
+}
+
+.table-td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  white-space: nowrap; /* Prevent data from wrapping too much */
+}
+
+/* --- Status Badges --- */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px; /* Fully rounded */
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.status-present {
+  background-color: var(--status-present-bg);
+  color: var(--status-present-text);
+}
+
+.status-leave {
+  background-color: var(--status-leave-bg);
+  color: var(--status-leave-text);
+}
+
+.status-absent {
+  background-color: var(--status-absent-bg);
+  color: var(--status-absent-text);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .attendance-page-container {
+    padding: 1rem;
+  }
+  .attendance-card {
+    padding: 1.5rem;
+  }
+  .attendance-title {
+    font-size: 1.75rem;
+  }
+  .add-record-button {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.9rem;
+  }
+  .table-th, .table-td {
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
+  }
+  .status-badge {
+    padding: 0.25rem 0.6rem;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .attendance-header {
+    flex-direction: column;
+    align-items: stretch; /* Stretch items to fill width */
+  }
+  .attendance-title {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .add-record-button {
+    width: 100%; /* Make button full width */
+    justify-content: center; /* Center button text */
+  }
+  .table-responsive {
+    /* On very small screens, let the overflow-x-auto handle it,
+       but consider a 'card' view for each row if complexity increases */
+  }
+}

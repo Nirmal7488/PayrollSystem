@@ -1,0 +1,310 @@
+/* src/styles/payroll.css */
+
+/* --- Base Styles & Variables --- */
+:root {
+  --primary-blue: #3f51b5; /* Deeper, more professional blue */
+  --primary-hover-blue: #303f9f;
+  --accent-green: #28a745; /* For success messages and gross pay */
+  --error-red: #dc3545; /* For error messages */
+  --text-dark: #343a40;
+  --text-medium: #6c757d;
+  --text-light: #f8f9fa;
+  --bg-light: #f4f7f6; /* Consistent light page background */
+  --border-light: #e0e0e0;
+  --card-bg: #ffffff;
+  --shadow-subtle: rgba(0, 0, 0, 0.08);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+
+  /* Specific for Payroll Summary */
+  --summary-bg: #e3f2fd; /* Light blue background for summary */
+  --summary-border: #90caf9; /* Medium blue border */
+  --summary-text: #1a237e; /* Dark blue text for summary title */
+}
+
+body {
+  margin: 0;
+  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-light);
+}
+
+/* --- General Page Container --- */
+.payroll-page-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+/* Loading/Error State Message */
+.payroll-page-container.loading-state {
+  text-align: center;
+  font-size: 1.15rem;
+  color: var(--text-medium);
+  padding: 2rem;
+}
+
+/* --- Payroll Card (Main container for content) --- */
+.payroll-card {
+  background-color: var(--card-bg);
+  padding: 2.5rem 3rem;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px var(--shadow-subtle);
+  width: 100%;
+  max-width: 600px; /* Adjusted max-width for the payroll form */
+  box-sizing: border-box;
+  border: 1px solid var(--border-light);
+}
+
+/* Form Title */
+.payroll-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  color: var(--text-dark);
+  letter-spacing: -0.02em;
+}
+
+/* --- Status Messages (Error/Success) --- */
+.status-message {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+}
+
+.status-message.error-message {
+  background-color: #ffebee; /* Light red */
+  color: var(--error-red);
+  border-color: #ef9a9a;
+}
+
+/* --- Form Grid --- */
+.payroll-form .form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem 2rem;
+}
+
+@media (min-width: 600px) { /* Two columns for larger screens */
+  .payroll-form .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .payroll-form .form-grid .form-group:last-child { /* Make the last group span full width on larger screens if only 3 inputs */
+    grid-column: span 2;
+    max-width: 50%; /* Center it by making it half width */
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* --- Form Group & Elements (Reusing from other forms) --- */
+.form-group {
+  position: relative;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 0.6rem;
+}
+
+.required-asterisk {
+  color: var(--error-red);
+  margin-left: 0.25rem;
+}
+
+.form-input {
+  display: block;
+  width: 100%;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px var(--shadow-subtle);
+  box-sizing: border-box;
+  font-size: 1rem;
+  color: var(--text-dark);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-color: var(--card-bg);
+  -webkit-appearance: none; /* Remove default select arrow */
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Input Error Border */
+.form-input.input-error-border {
+  border-color: var(--error-red);
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* Input Focus Styles */
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.2rem rgba(63, 81, 181, 0.25);
+}
+
+/* Style for select arrow */
+.form-group select.form-input {
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%236c757d" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.8rem center;
+    background-size: 1.25rem;
+    padding-right: 2.5rem;
+}
+
+/* Validation Message for Employee ID */
+.input-validation-message {
+  font-size: 0.8rem;
+  margin-top: 0.4rem;
+}
+
+.input-validation-message.error-message-small {
+  color: var(--error-red);
+}
+
+.input-validation-message.success-message-small {
+  color: var(--accent-green);
+}
+
+/* --- Action Buttons --- */
+.form-actions-center {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.5rem;
+}
+
+.submit-button {
+  padding: 1rem 2.5rem;
+  background-color: var(--primary-blue);
+  color: var(--text-light);
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(63, 81, 181, 0.2);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.submit-button:hover {
+  background-color: var(--primary-hover-blue);
+  box-shadow: 0 6px 15px rgba(63, 81, 181, 0.3);
+  transform: translateY(-1px);
+}
+
+.submit-button:active {
+  transform: translateY(0);
+}
+
+.submit-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.25rem rgba(63, 81, 181, 0.35);
+}
+
+/* Disabled Button Styles */
+.submit-button.disabled-button {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background-color: var(--primary-blue); /* Still primary blue but muted */
+  box-shadow: none;
+  transform: none;
+}
+
+/* --- Payroll Summary Section --- */
+.payroll-summary-card {
+  margin-top: 2.5rem;
+  padding: 2rem;
+  background-color: var(--summary-bg);
+  border-radius: 10px;
+  border: 1px solid var(--summary-border);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Subtle shadow for the summary card */
+}
+
+.summary-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--summary-text);
+  margin-bottom: 1.5rem;
+  text-align: center;
+  line-height: 1.4; /* Improve readability of multi-line titles */
+}
+
+.summary-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.summary-item {
+  font-size: 1rem;
+  color: var(--text-dark);
+}
+
+.summary-item strong {
+  font-weight: 600;
+}
+
+.gross-pay-result {
+  font-size: 2.2rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--accent-green); /* Highlight gross pay in green */
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--summary-border); /* Separator line */
+}
+
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 767px) {
+  .payroll-card {
+    padding: 1.5rem;
+  }
+  .payroll-title {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+  }
+  .form-input {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+  }
+  .submit-button {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+  }
+  .payroll-form .form-grid .form-group:last-child { /* On small screens, don't span full width or center */
+    grid-column: span 1;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .summary-title {
+    font-size: 1.3rem;
+  }
+  .gross-pay-result {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .payroll-card {
+    padding: 1rem;
+  }
+  .payroll-title {
+    font-size: 1.6rem;
+  }
+  .gross-pay-result {
+    font-size: 1.6rem;
+  }
+}

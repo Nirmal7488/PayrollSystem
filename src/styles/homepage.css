@@ -1,0 +1,221 @@
+/* src/styles/homepage.css */
+
+/* --- General & Layout --- */
+body {
+  margin: 0; /* Remove default body margin */
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.homepage-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column; /* Stacks header, main, footer vertically */
+  background: linear-gradient(to bottom right, #e0f2fe, #e0e7ff); /* Subtle gradient background */
+}
+
+/* --- Header --- */
+.app-header {
+  background-color: #ffffff;
+  padding: 1rem 2rem; /* Vertical and horizontal padding */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+  display: flex;
+  justify-content: space-between; /* Puts logo/title on left, button on right */
+  align-items: center;
+  flex-wrap: wrap; /* Allows wrapping on smaller screens */
+  position: sticky; /* Makes header sticky at the top */
+  top: 0;
+  z-index: 1000; /* Ensures header is above other content */
+}
+
+.app-logo {
+  flex-shrink: 0; /* Prevents shrinking on smaller screens */
+}
+
+.header-title {
+  font-size: 1.75rem; /* text-2xl */
+  font-weight: 800; /* font-extrabold */
+  color: #1e40af; /* text-blue-700 */
+  margin: 0; /* Remove default margin for heading */
+  letter-spacing: -0.025em; /* tight tracking */
+}
+
+.header-nav {
+  display: flex;
+  gap: 1rem; /* Space between nav items/buttons */
+  align-items: center;
+}
+
+.logout-button {
+  background-color: #dc2626; /* bg-red-600 */
+  color: #ffffff; /* text-white */
+  padding: 0.5rem 1rem; /* px-4 py-2 */
+  border-radius: 0.375rem; /* rounded-md */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+  transition: background-color 0.2s ease; /* transition-colors duration-200 */
+  font-size: 0.875rem; /* text-sm */
+  border: none; /* Remove default button border */
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background-color: #b91c1c; /* hover:bg-red-700 */
+}
+
+/* --- Main Content Area --- */
+.main-content-area {
+  flex-grow: 1; /* Allows main content to take available space */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem; /* Consistent padding */
+}
+
+/* --- Card Styling (moved from page-container, slight adjustments) --- */
+.card {
+  background-color: #ffffff; /* bg-white */
+  padding: 2.5rem; /* p-10 */
+  border-radius: 1rem; /* rounded-xl */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* shadow-2xl */
+  text-align: center;
+  max-width: 64rem; /* max-w-4xl */
+  width: 100%; /* w-full */
+  box-sizing: border-box; /* Ensures padding doesn't increase total width */
+  margin-top: 2rem; /* Add some margin from the header */
+  margin-bottom: 2rem; /* Add some margin from the footer */
+}
+
+/* Title styling */
+.title {
+  font-size: 3rem; /* text-5xl */
+  font-weight: 800; /* font-extrabold */
+  color: #1e40af; /* text-blue-700 */
+  margin-bottom: 1rem; /* mb-4 */
+  letter-spacing: -0.05em; /* tracking-tight */
+  line-height: 1.1; /* leading-tight */
+}
+
+/* Specific color for 'PayrollPro!' in the title */
+.title-highlight {
+  color: #3b82f6; /* text-blue-500 */
+}
+
+/* Subtitle/description styling */
+.subtitle {
+  font-size: 1.25rem; /* text-xl */
+  color: #4b5563; /* text-gray-600 */
+  margin-bottom: 3rem; /* mb-12 */
+  max-width: 42rem; /* max-w-2xl */
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.625; /* leading-relaxed */
+}
+
+/* Grid container for module links */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr; /* grid-cols-1 */
+  gap: 2rem; /* gap-8 */
+  margin-bottom: 3rem; /* mb-12 */
+}
+
+/* Media query for medium screens (md:grid-cols-2) */
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Media query for large screens (lg:grid-cols-3) */
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Styles for the individual card links (Employee, Attendance, Payroll) */
+.card-link {
+  display: block;
+  padding: 2rem; /* p-8 */
+  color: #ffffff; /* text-white */
+  border-radius: 1rem; /* rounded-xl */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); /* shadow-lg */
+  transition: all 0.3s ease; /* transition-all duration-300 */
+  text-decoration: none; /* Remove underline from links */
+  text-align: left; /* Align text within card link */
+}
+
+/* Hover effects for card links */
+.card-link:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* hover:shadow-xl */
+  transform: translateY(-0.25rem); /* hover:-translate-y-1 */
+}
+
+/* Specific background colors for each card link type */
+.card-link.blue {
+  background-color: #2563eb; /* bg-blue-600 */
+}
+.card-link.blue:hover {
+  background-color: #1d4ed8; /* hover:bg-blue-700 */
+}
+
+.card-link.green {
+  background-color: #16a34a; /* bg-green-600 */
+}
+.card-link.green:hover {
+  background-color: #15803d; /* hover:bg-green-700 */
+}
+
+.card-link.purple {
+  background-color: #7c3aed; /* bg-purple-600 */
+}
+.card-link.purple:hover {
+  background-color: #6d28d9; /* hover:bg-purple-700 */
+}
+
+/* Card title within link cards */
+.card-title {
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: 700; /* font-bold */
+  margin-bottom: 0.75rem; /* mb-3 */
+}
+
+/* Card description within link cards */
+.card-description {
+  font-size: 1rem; /* text-base */
+  opacity: 0.9; /* opacity-90 */
+}
+
+/* Footer text (logged in as) within the card */
+.footer-text-card {
+  color: #6b7280; /* text-gray-500 */
+  font-size: 0.875rem; /* text-sm */
+  margin-top: 2.5rem; /* mt-10 */
+  text-align: center;
+}
+
+/* Specific style for the email within the footer text */
+.footer-email {
+  font-weight: 600; /* font-semibold */
+  color: #374151; /* text-gray-700 */
+}
+
+/* --- Footer --- */
+.app-footer {
+  background-color: #374151; /* Darker gray for footer */
+  color: #d1d5db; /* Light gray text */
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.875rem; /* text-sm */
+  margin-top: auto; /* Pushes footer to the bottom if content is short */
+}
+
+/* Loading state specific styles */
+.page-container.loading-state {
+  background: linear-gradient(to bottom right, #f3f4f6, #e5e7eb); /* A simpler, lighter background for loading */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
