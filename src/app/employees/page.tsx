@@ -13,34 +13,16 @@ import '../../styles/employee-list.css'; // <-- Import your new CSS file here
 export default function EmployeesPage() {
   const { currentUser, loading: authLoading } = useAuth();
   const router = useRouter();
+
+  // --- All useState declarations must come first ---
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Redirect if not authenticated
-  if (!authLoading && !currentUser) {
-    router.push('/login');
-    return null;
-  }
-
-  const handleDelete = async (id: string, name: string) => {
-    if (!window.confirm(`Are you sure you want to deactivate ${name}?`)) {
-      return;
-    }
-    setError(null);
-    setSuccess(null);
-    try {
-      const employeeRef = doc(db, 'employees', id);
-      await updateDoc(employeeRef, { status: 'inactive' });
-      setSuccess(`${name} has been deactivated successfully!`);
-    } catch (err: any) {
-      setError(`Error deactivating ${name}: ${err.message}`);
-      console.error('Error deactivating employee:', err);
-    }
-  };
-
+  // --- All useEffect declarations must come next ---
   useEffect(() => {
+    // Only proceed if auth loading is complete
     if (authLoading) return;
 
     const q = query(
@@ -62,7 +44,8 @@ export default function EmployeesPage() {
           position: data.position || '',
           department: data.department || '',
           hireDate: data.hireDate || '',
-          baseSalary: data.baseSalary || 0,
+          // Ensure baseSalary is treated as a number
+          baseSalary: typeof data.baseSalary === 'string' ? parseFloat(data.baseSalary) : data.baseSalary || 0,
           status: data.status || 'active',
           createdAt: data.createdAt,
           updatedAt: data.updatedAt,
@@ -71,18 +54,50 @@ export default function EmployeesPage() {
           ifscCode: data.ifscCode || '',
           panNumber: data.panNumber || '',
           joiningDate: data.joiningDate || '',
+          aadhaarNumber: data.aadhaarNumber || '',
         } as Employee;
       });
       setEmployees(employees);
       setIsLoading(false);
-    }, (err) => {
-      console.error("Error fetching employees:", err);
-      setError("Failed to load employees. Please try again.");
+    }, (err: unknown) => { // FIX: Changed 'any' to 'unknown'
+      if (err instanceof Error) { // FIX: Added type guard
+        console.error("Error fetching employees:", err.message);
+        setError(`Failed to load employees: ${err.message}. Please try again.`);
+      } else {
+        console.error("An unknown error occurred while fetching employees:", err);
+        setError("Failed to load employees due to an unknown error. Please try again.");
+      }
       setIsLoading(false);
     });
 
     return () => unsubscribe();
-  }, [authLoading]);
+  }, [authLoading]); // Dependency: re-run if authLoading changes
+
+  // --- Redirect if not authenticated (This must come AFTER all hook calls) ---
+  if (!authLoading && !currentUser) {
+    router.push('/login');
+    return null; // Don't render anything if redirecting
+  }
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!window.confirm(`Are you sure you want to deactivate ${name}?`)) {
+      return;
+    }
+    setError(null);
+    setSuccess(null);
+    try {
+      const employeeRef = doc(db, 'employees', id);
+      await updateDoc(employeeRef, { status: 'inactive' });
+      setSuccess(`${name} has been deactivated successfully!`);
+    } catch (err: unknown) { // FIX: Changed 'any' to 'unknown'
+      if (err instanceof Error) { // FIX: Added type guard
+        setError(`Error deactivating ${name}: ${err.message}`);
+      } else {
+        setError(`Error deactivating ${name}: An unknown error occurred.`);
+      }
+      console.error('Error deactivating employee:', err);
+    }
+  };
 
   // Loading and Error states
   if (authLoading || isLoading) {
@@ -97,6 +112,9 @@ export default function EmployeesPage() {
     return (
       <div className="employee-page-container error-state">
         <p>{error}</p>
+        <Link href="/employees/add" className="add-employee-button">
+            Add New Employee
+        </Link>
       </div>
     );
   }

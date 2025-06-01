@@ -180,3 +180,6 @@
 .back-link:hover {
   text-decoration: underline; /* hover:underline */
 }
+.form-group.full-width {
+  grid-column: 1 / -1; /* Spans across all columns in the grid */
+}

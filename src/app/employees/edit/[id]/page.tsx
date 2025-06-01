@@ -1,6 +1,6 @@
 // src/app/employees/edit/[id]/page.tsx
 'use client';
-import React from 'react';
+import React from 'react'; // Make sure React is imported for React.use
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase';
@@ -12,30 +12,32 @@ import '../../../../styles/employee-edit.css'; // Reusing the same CSS file for 
 
 // Extend Employee to include the 'id' when fetching for internal use
 interface EditableEmployee extends Omit<Employee, 'createdAt' | 'updatedAt'> {
-    id: string; // The Firestore document ID
+  id: string; // The Firestore document ID
 }
 
 // Next.js App Router passes dynamic segments as 'params' prop
+// FIX: Revert params type back to Promise<{ id: string }> to satisfy Next.js's internal types
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = React.use(params);
+  // FIX: Use React.use to unwrap the promise type for params
+  const { id } = React.use(params); 
 
   const { currentUser, loading: authLoading } = useAuth();
   const router = useRouter();
 
+  // All useState declarations must come first
   const [employee, setEmployee] = useState<EditableEmployee | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Redirect if not authenticated (combining auth loading and actual auth status)
-  if (!authLoading && !currentUser) {
-    router.push('/login');
-    return null;
-  }
 
   // Effect to fetch employee data when the component mounts or ID/auth status changes
   useEffect(() => {
+    // Only proceed if ID is available and auth loading is complete
+    // We explicitly check if authLoading is false and currentUser is available
+    // because if authLoading is true, it means we're still waiting for user session.
+    // If authLoading is false but currentUser is null, the redirect will handle it later.
     if (!id || authLoading) return;
 
     const fetchEmployee = async () => {
@@ -45,6 +47,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
         if (docSnap.exists()) {
           const data = docSnap.data();
+          // Ensure baseSalary is treated as a number
+          const baseSalaryValue = typeof data.baseSalary === 'string' ? parseFloat(data.baseSalary) : data.baseSalary;
+          const parsedBaseSalary = isNaN(baseSalaryValue) ? 0 : baseSalaryValue; // Default to 0 if NaN
+
           setEmployee({
             id: docSnap.id,
             employeeId: data.employeeId || '',
@@ -56,7 +62,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             position: data.position || '',
             department: data.department || '',
             hireDate: data.hireDate || '',
-            baseSalary: typeof data.baseSalary === 'string' ? parseFloat(data.baseSalary) : data.baseSalary || 0,
+            baseSalary: parsedBaseSalary, // Use the parsed value
             status: data.status || 'active',
             designation: data.designation || '',
             bankAccountNumber: data.bankAccountNumber || '',
@@ -68,8 +74,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         } else {
           setError("Employee not found.");
         }
-      } catch (err: any) {
-        setError(`Error fetching employee: ${err.message}`);
+      } catch (err: unknown) { // Changed 'any' to 'unknown'
+        if (err instanceof Error) {
+          setError(`Error fetching employee: ${err.message}`);
+        } else {
+          setError('An unknown error occurred while fetching the employee.');
+        }
         console.error('Error fetching employee:', err);
       } finally {
         setIsLoading(false);
@@ -77,7 +87,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     };
 
     fetchEmployee();
-  }, [id, authLoading]);
+  }, [id, authLoading]); // Dependencies: re-run if id or authLoading changes
+
+  // Conditional render for authentication (This must come AFTER all hook calls)
+  if (!authLoading && !currentUser) {
+    router.push('/login');
+    return null; // Don't render anything if redirecting
+  }
 
   // Handle input changes in the form
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -85,6 +101,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     setEmployee(prev => {
       if (!prev) return null;
 
+      // Handle baseSalary as number, others as string
       return {
         ...prev,
         [name]: name === 'baseSalary' ? parseFloat(value) : value,
@@ -106,21 +123,32 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     }
 
     // Basic validation before submitting
-    if (!employee.employeeId || !employee.firstName || !employee.lastName || !employee.email || !employee.designation || typeof employee.baseSalary !== 'number' || isNaN(employee.baseSalary) || !employee.bankAccountNumber || !employee.ifscCode || !employee.panNumber || !employee.joiningDate) {
-        setError('Please fill in all required fields and ensure salary is a number.');
-        setIsSubmitting(false);
-        return;
+    if (!employee.employeeId || !employee.firstName || !employee.lastName || !employee.email || !employee.designation ||
+        typeof employee.baseSalary !== 'number' || isNaN(employee.baseSalary) || employee.baseSalary < 0 || // Ensure salary is valid number
+        !employee.bankAccountNumber || !employee.ifscCode || !employee.panNumber || !employee.joiningDate || !employee.position || !employee.department || !employee.hireDate || !employee.status)
+    {
+      setError('Please fill in all required fields and ensure salary is a valid number.');
+      setIsSubmitting(false);
+      return;
     }
 
     try {
       const docRef = doc(db, 'employees', id);
+      // Omit 'id' and potential other client-side only properties before updating
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { id: _employeeDocId, ...employeeDataToUpdate } = employee;
+
       await updateDoc(docRef, {
-        ...employee,
+        ...employeeDataToUpdate,
         updatedAt: serverTimestamp(),
       });
       setSuccess('Employee updated successfully!');
-    } catch (err: any) {
-      setError(`Error updating employee: ${err.message}`);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(`Error updating employee: ${err.message}`);
+      } else {
+        setError('An unknown error occurred while updating the employee.');
+      }
       console.error('Error updating employee:', err);
     } finally {
       setIsSubmitting(false);
@@ -130,41 +158,47 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   // Display loading state while fetching data
   if (authLoading || isLoading) {
     return (
-      <div className="add-employee-page-container loading-state"> {/* Reusing loading state class */}
+      <div className="add-employee-page-container loading-state">
         <p>Loading employee data...</p>
       </div>
     );
   }
 
-  // Display error if fetching failed
-  if (error && !employee) { // Only show full error if no employee loaded
+  // Display error if fetching failed or employee not found after loading
+  if (error) {
     return (
-      <div className="add-employee-page-container error-state"> {/* Reusing error state class */}
+      <div className="add-employee-page-container error-state">
         <p>{error}</p>
+        <Link href="/employees" className="back-link">
+          Back to Employee List
+        </Link>
       </div>
     );
   }
 
-  // If employee is null (e.g., ID was invalid after loading), show 'not found'
+  // If employee is null (e.g., ID was invalid after loading, or no error but no data), show 'not found'
   if (!employee) {
     return (
-      <div className="add-employee-page-container error-state"> {/* Reusing error state class */}
-        <p>Employee not found.</p>
+      <div className="add-employee-page-container error-state">
+        <p>Employee data could not be loaded or was not found.</p>
+        <Link href="/employees" className="back-link">
+          Back to Employee List
+        </Link>
       </div>
     );
   }
 
   // Render the edit form
   return (
-    <div className="add-employee-page-container"> {/* Reusing general container class */}
-      <div className="employee-form-card"> {/* Reusing form card class */}
-        <h2 className="form-title">Edit Employee: {employee.firstName} {employee.lastName}</h2> {/* Reusing form title class */}
+    <div className="add-employee-page-container">
+      <div className="employee-form-card">
+        <h2 className="form-title">Edit Employee: {employee.firstName} {employee.lastName}</h2>
 
-        {error && <p className="status-message error-message">{error}</p>} {/* Reusing status message classes */}
+        {error && <p className="status-message error-message">{error}</p>}
         {success && <p className="status-message success-message">{success}</p>}
 
-        <form onSubmit={handleSubmit} className="employee-form"> {/* Reusing form class */}
-          <div className="form-grid"> {/* Reusing form grid class */}
+        <form onSubmit={handleSubmit} className="employee-form">
+          <div className="form-grid">
             {/* Employee ID - Read-only */}
             <div className="form-group">
               <label htmlFor="employeeId" className="form-label">Employee ID</label>
@@ -233,22 +267,37 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                     <option value="inactive">Inactive</option>
                 </select>
             </div>
+            {/* Position */}
+            <div className="form-group">
+                <label htmlFor="position" className="form-label">Position <span className="required-asterisk">*</span></label>
+                <input type="text" id="position" name="position" value={employee.position} onChange={handleChange} required className="form-input" />
+            </div>
+            {/* Department */}
+            <div className="form-group">
+                <label htmlFor="department" className="form-label">Department <span className="required-asterisk">*</span></label>
+                <input type="text" id="department" name="department" value={employee.department} onChange={handleChange} required className="form-input" />
+            </div>
+            {/* Hire Date */}
+            <div className="form-group">
+                <label htmlFor="hireDate" className="form-label">Hire Date <span className="required-asterisk">*</span></label>
+                <input type="date" id="hireDate" name="hireDate" value={employee.hireDate} onChange={handleChange} required className="form-input" />
+            </div>
           </div>
           {/* Address (full width) */}
-          <div className="form-group full-width"> {/* Reusing full-width class */}
+          <div className="form-group full-width">
             <label htmlFor="address" className="form-label">Address</label>
             <textarea id="address" name="address" value={employee.address || ''} onChange={handleChange} rows={3} className="form-input"></textarea>
           </div>
 
           {/* Action buttons */}
-          <div className="form-actions-edit"> {/* New class for edit page actions */}
-            <Link href="/employees" className="back-link"> {/* Reusing back-link class */}
+          <div className="form-actions-edit">
+            <Link href="/employees" className="back-link">
               Back to Employee List
             </Link>
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`submit-button update-button ${isSubmitting ? 'disabled-button' : ''}`} 
+              className={`submit-button update-button ${isSubmitting ? 'disabled-button' : ''}`}
             >
               {isSubmitting ? 'Updating Employee...' : 'Update Employee'}
             </button>

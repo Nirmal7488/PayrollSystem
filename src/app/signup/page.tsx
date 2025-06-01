@@ -20,8 +20,12 @@ export default function SignupPage() {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       router.push('/'); // Redirect to homepage on successful signup
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) { // FIX: Changed 'any' to 'unknown'
+      if (err instanceof Error) { // FIX: Added type guard
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred during signup.');
+      }
       console.error('Signup error:', err);
     }
   };

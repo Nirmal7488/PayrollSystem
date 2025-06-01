@@ -20,8 +20,12 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/'); // Redirect to homepage on successful login
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) { // FIX: Changed 'any' to 'unknown'
+      if (err instanceof Error) { // FIX: Added type guard
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred during login.');
+      }
       console.error('Login error:', err);
     }
   };
@@ -62,7 +66,7 @@ export default function LoginPage() {
           </button>
         </form>
         <p className="signup-text">
-          Don't have an account? <Link href="/signup" className="signup-link">Sign Up</Link>
+          Don&apos;t have an account? <Link href="/signup" className="signup-link">Sign Up</Link> {/* FIX: Replaced ' with &apos; */}
         </p>
       </div>
     </div>

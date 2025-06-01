@@ -14,6 +14,7 @@ export default function AddEmployeePage() {
   const { currentUser, loading: authLoading } = useAuth();
   const router = useRouter();
 
+  // All useState declarations must come first
   const [employeeId, setEmployeeId] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -40,11 +41,24 @@ export default function AddEmployeePage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [isEmployeeIdUnique, setIsEmployeeIdUnique] = useState<boolean | null>(null);
 
-  // Redirect if not authenticated
-  if (!authLoading && !currentUser) {
-    router.push('/login');
-    return null;
-  }
+  // --- FIX 1: Move all useEffect hooks to the top level, before any conditional returns ---
+
+  // Effect to set today's date as default for hireDate and joiningDate
+  useEffect(() => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const formattedDate = `${yyyy}-${mm}-${dd}`;
+
+    if (!hireDate) { // Only set if not already set by user
+      setHireDate(formattedDate);
+    }
+    if (!joiningDate) { // Only set if not already set by user
+      setJoiningDate(formattedDate);
+    }
+  }, [hireDate, joiningDate]); // Depend on hireDate and joiningDate to avoid infinite loops if they're manually changed later
+
 
   // Effect for Employee ID uniqueness check (debounced)
   useEffect(() => {
@@ -71,11 +85,25 @@ export default function AddEmployeePage() {
     return () => clearTimeout(timer);
   }, [employeeId]);
 
+  // --- Conditional return for authentication (This must come AFTER all hook calls) ---
+  if (!authLoading && !currentUser) {
+    router.push('/login');
+    return null; // Don't render anything if redirecting
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
     setIsLoading(true);
+
+    // Basic validation for required fields
+    if (!employeeId || !firstName || !lastName || !email || !position || !department || !hireDate || !baseSalary ||
+        !designation || !bankAccountNumber || !ifscCode || !panNumber || !joiningDate || !aadhaarNumber) {
+      setError('Please fill in all required fields.');
+      setIsLoading(false);
+      return;
+    }
 
     if (isEmployeeIdUnique === false) { // Check if it's explicitly false
       setError('Employee ID must be unique.');
@@ -83,32 +111,49 @@ export default function AddEmployeePage() {
       return;
     }
 
+    // Optional: Add a check to ensure employee ID validation has completed before allowing submission
+    if (isEmployeeIdUnique === null && employeeId.trim() !== '') {
+        setError('Please wait for Employee ID validation to complete.');
+        setIsLoading(false);
+        return;
+    }
+
     try {
+      // Ensure numerical fields are parsed correctly
+      const parsedBaseSalary = parseFloat(baseSalary);
+      if (isNaN(parsedBaseSalary)) {
+        setError('Base Salary must be a valid number.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Prepare the new employee object
       const newEmployee: Omit<Employee, 'id'> = {
         employeeId: employeeId.trim(),
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim(),
-        phone: phone.trim() || null,
+        phone: phone.trim() || null, // Allow optional fields to be null if empty string
         address: address.trim() || null,
         position: position.trim(),
         department: department.trim(),
-        hireDate: hireDate,
-        baseSalary: parseFloat(baseSalary),
+        hireDate: hireDate, // Already formatted as YYYY-MM-DD
+        baseSalary: parsedBaseSalary,
         status: status,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
         designation: designation.trim(),
         bankAccountNumber: bankAccountNumber.trim(),
         ifscCode: ifscCode.trim(),
         panNumber: panNumber.trim(),
-        joiningDate: joiningDate,
+        joiningDate: joiningDate, // Already formatted as YYYY-MM-DD
         aadhaarNumber: aadhaarNumber.trim(),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       };
 
       await addDoc(collection(db, 'employees'), newEmployee);
       setSuccess('Employee added successfully!');
-      // Clear form
+
+      // Clear form fields after successful submission
       setEmployeeId('');
       setFirstName('');
       setLastName('');
@@ -117,25 +162,30 @@ export default function AddEmployeePage() {
       setAddress('');
       setPosition('');
       setDepartment('');
-      setHireDate('');
+      // Leave hireDate and joiningDate to be set by useEffect default
       setBaseSalary('');
       setStatus('active');
       setDesignation('');
       setBankAccountNumber('');
       setIfscCode('');
       setPanNumber('');
-      setJoiningDate('');
+      // Leave joiningDate to be set by useEffect default
       setAadhaarNumber('');
-      setIsEmployeeIdUnique(null);
+      setIsEmployeeIdUnique(null); // Reset validation state for next entry
 
-    } catch (err: any) {
-      setError(`Error adding employee: ${err.message}`);
+    } catch (err: unknown) { // --- FIX 2: Changed 'any' to 'unknown'
+      if (err instanceof Error) {
+        setError(`Error adding employee: ${err.message}`);
+      } else {
+        setError('An unknown error occurred while adding the employee.');
+      }
       console.error('Error adding employee:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Show loading state while authentication is in progress
   if (authLoading) {
     return (
       <div className="add-employee-page-container loading-state">
@@ -167,6 +217,9 @@ export default function AddEmployeePage() {
               />
               {isEmployeeIdUnique === false && (
                 <p className="input-validation-message error-message-small">Employee ID already exists.</p>
+              )}
+              {isEmployeeIdUnique === true && (
+                <p className="input-validation-message success-message-small">Employee ID is unique.</p>
               )}
             </div>
 
@@ -261,15 +314,16 @@ export default function AddEmployeePage() {
             </div>
 
             {/* Status (hidden/default for Add) */}
-            <input type="hidden" value={status} />
+            {/* This is implicitly handled by the status state, no need for a hidden input if it's always 'active' on add */}
+            {/* <input type="hidden" value={status} /> */}
 
           </div>
 
           <div className="form-actions">
             <button
               type="submit"
-              disabled={isLoading || isEmployeeIdUnique === false}
-              className={`submit-button ${isLoading || isEmployeeIdUnique === false ? 'disabled-button' : ''}`}
+              disabled={isLoading || isEmployeeIdUnique === false || isEmployeeIdUnique === null}
+              className={`submit-button ${isLoading || isEmployeeIdUnique === false || isEmployeeIdUnique === null ? 'disabled-button' : ''}`}
             >
               {isLoading ? 'Adding...' : 'Add Employee'}
             </button>

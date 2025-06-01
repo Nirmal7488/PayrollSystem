@@ -23,9 +23,14 @@ export default function HomePage() {
     try {
       await logout(); // Call the logout function from your AuthContext
       router.push('/login'); // Redirect to login page after successful logout
-    } catch (error: any) {
-      console.error("Error logging out:", error);
-      alert(`Failed to logout: ${error.message}`); // Simple alert for now
+    } catch (error: unknown) { // FIX: Changed 'any' to 'unknown'
+      if (error instanceof Error) { // FIX: Added type guard
+        console.error("Error logging out:", error);
+        alert(`Failed to logout: ${error.message}`); // Simple alert for now
+      } else {
+        console.error("An unknown error occurred during logout:", error);
+        alert("Failed to logout due to an unknown error.");
+      }
     }
   };
 

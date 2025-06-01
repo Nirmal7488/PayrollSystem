@@ -8,36 +8,35 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { useAuth } from '@/lib/AuthContext';
 import { Employee } from '@/types/employee';
 import { Attendance } from '@/types/attendance';
-import Link from 'next/link';
+// import Link from 'next/link'; // FIX: Removed Link import as it's unused in the current component structure
 import '../../styles/payroll.css'; // Import the new payroll-specific CSS
 
 export default function PayrollCalculationPage() {
   const { currentUser, loading: authLoading } = useAuth();
   const router = useRouter();
 
+  // --- All useState declarations must come first ---
   const [employeeId, setEmployeeId] = useState('');
   const [month, setMonth] = useState('');
   const [year, setYear] = useState('');
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [attendanceRecords, setAttendanceRecords] = useState<Attendance[]>([]);
   const [calculatedGrossPay, setCalculatedGrossPay] = useState<number | null>(null);
-
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [employeeExists, setEmployeeExists] = useState<boolean | null>(null);
 
+  // --- All useEffect declarations must come next ---
   useEffect(() => {
     const today = new Date();
     setMonth(String(today.getMonth() + 1).padStart(2, '0'));
     setYear(String(today.getFullYear()));
   }, []);
 
-  if (!authLoading && !currentUser) {
-    router.push('/login');
-    return null;
-  }
-
   useEffect(() => {
+    // This effect should only run if auth is loaded, to prevent premature checks
+    if (authLoading) return;
+
     const checkEmployee = async () => {
       if (!employeeId.trim()) {
         setEmployeeExists(null);
@@ -56,8 +55,14 @@ export default function PayrollCalculationPage() {
           setEmployeeExists(false);
           setEmployee(null);
         }
-      } catch (err) {
-        console.error("Error checking employee ID:", err);
+      } catch (err: unknown) { // FIX: Changed 'any' to 'unknown'
+        if (err instanceof Error) { // FIX: Added type guard
+          console.error("Error checking employee ID:", err.message);
+          setError(`Error checking employee ID: ${err.message}`); // Optional: display this error to user
+        } else {
+          console.error("An unknown error occurred while checking employee ID:", err);
+          setError("An unknown error occurred while checking employee ID.");
+        }
         setEmployeeExists(false);
         setEmployee(null);
       }
@@ -68,7 +73,13 @@ export default function PayrollCalculationPage() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [employeeId]);
+  }, [employeeId, authLoading]); // Dependency: include authLoading to ensure effect runs after auth is ready
+
+  // --- Conditional redirect for authentication (This must come AFTER all hook calls) ---
+  if (!authLoading && !currentUser) {
+    router.push('/login');
+    return null;
+  }
 
   const handleCalculatePayroll = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,8 +101,11 @@ export default function PayrollCalculationPage() {
     }
 
     try {
-      const startDate = `${year}-${month}-01`;
-      const endDate = new Date(parseInt(year), parseInt(month), 0).toISOString().slice(0, 10);
+      // Create start and end dates for the month/year
+      const yearInt = parseInt(year);
+      const monthInt = parseInt(month);
+      const startDate = new Date(yearInt, monthInt - 1, 1).toISOString().slice(0, 10); // YYYY-MM-DD format
+      const endDate = new Date(yearInt, monthInt, 0).toISOString().slice(0, 10); // Last day of the month
 
       const attendanceRef = collection(db, 'attendance');
       const qAttendance = query(
@@ -124,26 +138,26 @@ export default function PayrollCalculationPage() {
 
       const dailySalary = (employee?.baseSalary ?? 0) / 30; // Assuming 30 days for daily salary calculation
       const totalDaysPresent = records.length;
-      let totalHoursWorked = 0;
 
-      records.forEach(record => {
-        if (record.hoursWorked) {
-          totalHoursWorked += record.hoursWorked;
-        }
-      });
+      // FIX: Removed unused 'totalHoursWorked' variable and its associated loop
+      // totalHoursWorked is calculated directly in JSX using reduce if needed for display
 
       const grossPay = totalDaysPresent * dailySalary;
       setCalculatedGrossPay(grossPay);
 
-    } catch (err: any) {
-      setError(`Error calculating payroll: ${err.message}`);
+    } catch (err: unknown) { // FIX: Changed 'any' to 'unknown'
+      if (err instanceof Error) { // FIX: Added type guard
+        setError(`Error calculating payroll: ${err.message}`);
+      } else {
+        setError('An unknown error occurred while calculating payroll.');
+      }
       console.error('Error calculating payroll:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (authLoading) {
+  if (authLoading) { // This conditional check is fine here because it comes after all hooks
     return (
       <div className="payroll-page-container loading-state">
         <p>Loading user session...</p>
